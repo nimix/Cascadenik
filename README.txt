@@ -1,3 +1,6 @@
+Note: Cascadenik2 branch is intended for upcoming work with Mapnik2
+and mapnik/reference.json.
+
 - Usage -
 
 * See INSTALL.txt for installation instructions. *
