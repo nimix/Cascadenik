@@ -634,7 +634,7 @@ def is_merc_projection(srs):
     # expected
     # note, common optional modifiers like +no_defs, +over, and +wkt
     # are not pairs and should not prevent matching
-    gym = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null'
+    gym = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m'
     gym = dict([p.split('=') for p in gym.split() if '=' in p])
         
     for p in gym:
@@ -1464,6 +1464,12 @@ def compile(src, dirs, verbose=False, srs=None, datasources_cfg=None):
             continue
         datasource_templates[base_el.get('name')] = dict(((p.get('name'),p.text) for p in base_el.findall('Parameter')))
     
+    fontsets = []
+    for fontset_el in map_el.findall('FontSet'):
+        name = fontset_el.get('name', 'noName')
+        face_names = [f.get('face_name') for f in fontset_el.findall('Font')]
+        fontsets.append(output.Fontset(name,face_names))
+    
     for layer_el in map_el.findall('Layer'):
     
         # nevermind with this one
@@ -1527,8 +1533,7 @@ def compile(src, dirs, verbose=False, srs=None, datasources_cfg=None):
             styles.append(output.Style('text style %d (%s)' % (ids.next(), text_name), text_rules))
 
         styles.append(output.Style('point style %d' % ids.next(),
-                                   get_point_rules(layer_declarations, dirs)))
-                                   
+                                   get_point_rules(layer_declarations, dirs)))                                   
         styles = [s for s in styles if s.rules]
         
         if styles:
@@ -1548,4 +1553,5 @@ def compile(src, dirs, verbose=False, srs=None, datasources_cfg=None):
     if srs is not None:
         map_el.set('srs', srs)
     
-    return output.Map(map_el.attrib.get('srs', None), layers, **map_attrs)
+    return output.Map(map_el.attrib.get('srs', None), layers, fontsets, **map_attrs)
+
