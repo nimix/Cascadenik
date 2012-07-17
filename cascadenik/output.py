@@ -381,7 +381,8 @@ class TextSymbolizer:
 class ShieldSymbolizer:
     def __init__(self, name, face_name=None, size=None, file=None, filetype=None, \
         width=None, height=None, color=None, minimum_distance=None, character_spacing=None, \
-        line_spacing=None, label_spacing=None, fontset=None, text_dx=0, text_dy=0):
+        line_spacing=None, label_spacing=None, fontset=None, text_dx=0, text_dy=0, 
+        allow_overlap=None, shield_dx=None, shield_dy=None):
         
         assert (face_name or fontset) and file
         
@@ -397,9 +398,12 @@ class ShieldSymbolizer:
         assert line_spacing is None or type(line_spacing) is int
         assert label_spacing is None or type(label_spacing) is int
         assert minimum_distance is None or type(minimum_distance) is int
+        assert allow_overlap is None or allow_overlap.__class__ is style.boolean
 
-        assert text_dx is None or type(text_dx) is int
-        assert text_dy is None or type(text_dy) is int
+        assert text_dx is None or type(text_dx) is float
+        assert text_dy is None or type(text_dy) is float
+        assert shield_dx is None or type(shield_dx) is float
+        assert shield_dy is None or type(shield_dy) is float
 
         self.name = safe_str(name)
         self.face_name = safe_str(face_name) or ''
@@ -415,8 +419,11 @@ class ShieldSymbolizer:
         self.line_spacing = line_spacing
         self.label_spacing = label_spacing
         self.minimum_distance = minimum_distance
+        self.allow_overlap = allow_overlap
         self.text_dx = text_dx
         self.text_dy = text_dy
+        self.shield_dx = shield_dx
+        self.shield_dy = shield_dy
 
     def __repr__(self):
         return 'Shield(%s, %s, %s, %s)' % (self.name, self.face_name, self.size, self.file)
@@ -439,14 +446,20 @@ class ShieldSymbolizer:
         sym.label_placement = self.label_spacing and mapnik.label_placement.LINE_PLACEMENT or sym.label_placement
         sym.label_spacing = self.label_spacing or sym.label_spacing
         sym.minimum_distance = self.minimum_distance or sym.minimum_distance
-
+        sym.allow_overlap = self.allow_overlap.value if self.allow_overlap else sym.allow_overlap
+        
         if self.fontset:
             sym.fontset = self.fontset.value
         
         if MAPNIK_VERSION >= 20000:
-            sym.displacement = (self.text_dx or 0, self.text_dy or 0)
+            sym.displacement = (self.text_dx or 0.0, self.text_dy or 0.0)
         else:
-            sym.displacement(self.text_dx or 0, self.text_dy or 0)
+            sym.displacement(self.text_dx or 0.0, self.text_dy or 0.0)
+        
+        if MAPNIK_VERSION >= 20000:
+            sym.shield_displacement = (self.shield_dx or 0.0, self.shield_dy or 0.0)
+        else:
+            sym.shield_displacement(self.shield_dx or 0.0, self.shield_dy or 0.0)
         
         return sym
 

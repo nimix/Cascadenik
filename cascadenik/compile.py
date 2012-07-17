@@ -1165,8 +1165,8 @@ def get_shield_rule_groups(declarations, dirs):
                     'shield-spacing': 'spacing', 'shield-min-distance': 'minimum_distance',
                     'shield-file': 'file', 'shield-width': 'width', 'shield-height': 'height',
                     'shield-meta-output': 'meta-output', 'shield-meta-writer': 'meta-writer',
-                    'shield-text-dx': 'dx', 'shield-text-dy': 'dy'}
-
+                    'shield-text-dx': 'dx', 'shield-text-dy': 'dy', 'shield-allow-overlap': 'allow-overlap',
+                    'shield-shield-dx':'shield-dx','shield-shield-dy':'shield-dy'}
     property_names = property_map.keys()
     
     # pull out all the names
@@ -1216,10 +1216,16 @@ def get_shield_rule_groups(declarations, dirs):
             text_dx = values.has_key('shield-text-dx') and values['shield-text-dx'].value or 0
             text_dy = values.has_key('shield-text-dy') and values['shield-text-dy'].value or 0
             
+            allow_overlap = values.has_key('shield-allow-overlap') and values['shield-allow-overlap'].value or None
+
+            shield_dx = values.has_key('shield-shield-dx') and values['shield-shield-dx'].value or 0
+            shield_dy = values.has_key('shield-shield-dy') and values['shield-shield-dy'].value or 0
+
             if file and (face_name or fontset):
                 symbolizer = output.ShieldSymbolizer(text_name, face_name, size, file, filetype, 
                                             width, height, color, minimum_distance, character_spacing,
                                             line_spacing, label_spacing, text_dx=text_dx, text_dy=text_dy,
+                                            allow_overlap=allow_overlap, shield_dx=shield_dx, shield_dy=shield_dy,
                                             fontset=fontset)
             
                 rules.append(make_rule(filter, symbolizer))

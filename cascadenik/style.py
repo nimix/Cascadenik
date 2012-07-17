@@ -328,8 +328,15 @@ properties = {
     'shield-line-spacing': int,
 
     # Text offset in pixels from image center
-    'shield-text-dx': int,
-    'shield-text-dy': int,
+    'shield-text-dx': float,
+    'shield-text-dy': float,
+
+    # Shield image offset in pixels from image center
+    'shield-shield-dx': float,
+    'shield-shield-dy': float,
+
+    # Allow shield to overlap other labels
+    'shield-allow-overlap': boolean,
 
     # path to image file (default none)
     'shield-file': uri,
