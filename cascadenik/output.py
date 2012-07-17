@@ -373,7 +373,8 @@ class TextSymbolizer:
 class ShieldSymbolizer:
     def __init__(self, name, face_name=None, size=None, file=None, \
         color=None, minimum_distance=None, character_spacing=None, \
-        line_spacing=None, spacing=None, fontset=None, transform=None):
+        line_spacing=None, spacing=None, fontset=None, transform=None, allow_overlap=None, \
+        shield_dx=None,shield_dy=None,dx=None,dy=None):
         
         assert (face_name or fontset) and file
         
@@ -388,6 +389,11 @@ class ShieldSymbolizer:
         assert spacing is None or type(spacing) is int
         assert minimum_distance is None or type(minimum_distance) is int
         assert transform is None or isinstance(transform, basestring)
+        assert allow_overlap is None or allow_overlap.__class__ is style.boolean
+        assert dx is None or type(dx) is float
+        assert dy is None or type(dy) is float
+        assert shield_dx is None or type(shield_dx) is float
+        assert shield_dy is None or type(shield_dy) is float
 
         self.name = safe_str(name)
         self.face_name = safe_str(face_name) or ''
@@ -401,7 +407,12 @@ class ShieldSymbolizer:
         self.line_spacing = line_spacing
         self.spacing = spacing
         self.minimum_distance = minimum_distance
+        self.allow_overlap = allow_overlap
 
+        self.dx = dx
+        self.dy = dy
+        self.shield_dx = shield_dx
+        self.shield_dy = shield_dy
     def __repr__(self):
         return 'Shield(%s, %s, %s, %s)' % (self.name, self.face_name, self.size, self.file)
 
@@ -417,8 +428,17 @@ class ShieldSymbolizer:
         sym.line_spacing = self.line_spacing or sym.line_spacing
         sym.spacing = self.spacing or sym.line_spacing
         sym.minimum_distance = self.minimum_distance or sym.minimum_distance
+        sym.allow_overlap = self.allow_overlap.value if self.allow_overlap else sym.allow_overlap
         if self.fontset:
             sym.fontset = self.fontset.value
+        try:
+            sym.displacement = (self.dx or 0.0, self.dy or 0.0)
+        except:
+            sym.displacement(self.dx or 0.0, self.dy or 0.0)
+        try:
+            sym.shield_displacement = (self.shield_dx or 0.0, self.shield_dy or 0.0)
+        except:
+            sym.shield_displacement(self.shield_dx or 0.0, self.shield_dy or 0.0)
         
         return sym
 

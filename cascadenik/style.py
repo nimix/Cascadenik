@@ -354,7 +354,15 @@ properties = {
     
     # 
     'shield-size': int,
-
+    'shield-width': int,    
+    'shield-height': int,
+    'shield-shield-dx': float,
+    'shield-shield-dy': float,
+    'shield-dx': float,
+    'shield-dy': float,
+    'shield-height': int,
+    # Allow shield to overlap other labels
+    'shield-allow-overlap': boolean,
     # 
     'shield-fill': color,
 

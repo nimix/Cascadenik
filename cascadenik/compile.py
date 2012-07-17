@@ -1163,7 +1163,10 @@ def get_shield_rule_groups(declarations, dirs):
                     'shield-spacing': 'spacing', 'shield-min-distance': 'minimum_distance',
                     'shield-file': 'file', 'shield-width': 'width', 'shield-height': 'height',
                     'shield-transform': 'transform',
-                    'shield-meta-output': 'meta-output', 'shield-meta-writer': 'meta-writer'}
+                    'shield-meta-output': 'meta-output', 'shield-meta-writer': 'meta-writer',
+                    'shield-allow-overlap': 'allow-overlap',
+                    'shield-shield-dx':'shield-dx','shield-shield-dy':'shield-dy',
+                    'shield-dx':'dx','shield-dy':'dy'}
 
     property_names = property_map.keys()
     
@@ -1207,13 +1210,20 @@ def get_shield_rule_groups(declarations, dirs):
             character_spacing = values.has_key('shield-character-spacing') and values['shield-character-spacing'].value or None
             line_spacing = values.has_key('shield-line-spacing') and values['shield-line-spacing'].value or None
             spacing = values.has_key('shield-spacing') and values['shield-spacing'].value or None
+            allow_overlap = values.has_key('shield-allow-overlap') and values['shield-allow-overlap'].value or None
+            dx = values.has_key('shield-dx') and values['shield-dx'].value or None
+            dy = values.has_key('shield-dy') and values['shield-dy'].value or None
+            shield_dx = values.has_key('shield-shield-dx') and values['shield-shield-dx'].value or None
+            shield_dy = values.has_key('shield-shield-dy') and values['shield-shield-dy'].value or None
             
             if file and (face_name or fontset):
                 symbolizer = output.ShieldSymbolizer(text_name, face_name, size, 
                                             file, color, minimum_distance,
                                             character_spacing, line_spacing, spacing,
-                                            fontset=fontset, transform=transform)
-            
+                                            fontset=fontset, transform=transform, allow_overlap=allow_overlap,
+                                            shield_dx=shield_dx,shield_dy=shield_dy,dx=dx,dy=dy)
+
+                
                 rules.append(make_rule(filter, symbolizer))
         
         groups.append((text_name, rules))
@@ -1539,11 +1549,45 @@ def compile(src, dirs, verbose=False, srs=None, datasources_cfg=None):
         if styles:
             datasource = output.Datasource(**datasource_params)
             
+            minzoom = layer_el.get('min_zoom', None) and int(layer_el.get('min_zoom'))
+            maxzoom = layer_el.get('max_zoom', None) and int(layer_el.get('max_zoom'))
+
+            zooms = {
+                 0: (500000000, 1000000000),
+                 1: (200000000, 500000000),
+                 2: (100000000, 200000000),
+                 3: (50000000, 100000000),
+                 4: (25000000, 50000000),
+                 5: (12500000, 25000000),
+                 6: (6500000, 12500000),
+                 7: (3000000, 6500000),
+                 8: (1500000, 3000000),
+                 9: (750000, 1500000),
+                10: (400000, 750000),
+                11: (200000, 400000),
+                12: (100000, 200000),
+                13: (50000, 100000),
+                14: (25000, 50000),
+                15: (12500, 25000),
+                16: (5000, 12500),
+                17: (2500, 5000),
+                18: (1000, 2500),
+                19: (500, 1000),
+                20: (250, 500),
+                21: (100, 250),
+                22: (50, 100),
+               }
+
+            if minzoom is not None and maxzoom is not None and minzoom < 23 and maxzoom < 23:
+                tminzoom = min(zooms[maxzoom])
+                maxzoom = max(zooms[minzoom])
+                minzoom = tminzoom
+
             layer = output.Layer('layer %d' % ids.next(),
                                  datasource, styles,
                                  layer_el.get('srs', None),
-                                 layer_el.get('min_zoom', None) and int(layer_el.get('min_zoom')) or None,
-                                 layer_el.get('max_zoom', None) and int(layer_el.get('max_zoom')) or None)
+                                 minzoom,
+                                 maxzoom)
     
             layers.append(layer)
     
