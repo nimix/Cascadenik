@@ -1213,13 +1213,13 @@ def get_shield_rule_groups(declarations, dirs):
             line_spacing = values.has_key('shield-line-spacing') and values['shield-line-spacing'].value or None
             label_spacing = values.has_key('shield-spacing') and values['shield-spacing'].value or None
             
-            text_dx = values.has_key('shield-text-dx') and values['shield-text-dx'].value or 0
-            text_dy = values.has_key('shield-text-dy') and values['shield-text-dy'].value or 0
+            text_dx = values.has_key('shield-text-dx') and values['shield-text-dx'].value or 0.0
+            text_dy = values.has_key('shield-text-dy') and values['shield-text-dy'].value or 0.0
             
             allow_overlap = values.has_key('shield-allow-overlap') and values['shield-allow-overlap'].value or None
 
-            shield_dx = values.has_key('shield-shield-dx') and values['shield-shield-dx'].value or 0
-            shield_dy = values.has_key('shield-shield-dy') and values['shield-shield-dy'].value or 0
+            shield_dx = values.has_key('shield-shield-dx') and values['shield-shield-dx'].value or 0.0
+            shield_dy = values.has_key('shield-shield-dy') and values['shield-shield-dy'].value or 0.0
 
             if file and (face_name or fontset):
                 symbolizer = output.ShieldSymbolizer(text_name, face_name, size, file, filetype, 

@@ -381,8 +381,8 @@ class TextSymbolizer:
 class ShieldSymbolizer:
     def __init__(self, name, face_name=None, size=None, file=None, filetype=None, \
         width=None, height=None, color=None, minimum_distance=None, character_spacing=None, \
-        line_spacing=None, label_spacing=None, fontset=None, text_dx=0, text_dy=0, 
-        allow_overlap=None, shield_dx=None, shield_dy=None):
+        line_spacing=None, label_spacing=None, fontset=None, text_dx=0.0, text_dy=0.0, 
+        allow_overlap=None, shield_dx=0.0, shield_dy=0.0):
         
         assert (face_name or fontset) and file
         
