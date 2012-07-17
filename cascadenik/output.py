@@ -7,13 +7,15 @@ def safe_str(s):
     return None if not s else unicode(s).encode('utf-8')
 
 class Map:
-    def __init__(self, srs=None, layers=None, background=None):
+    def __init__(self, srs=None, layers=None, fontsets=None, background=None):
         assert srs is None or isinstance(srs, basestring)
         assert layers is None or type(layers) in (list, tuple)
         assert background is None or background.__class__ is style.color or background == 'transparent'
+        assert fontsets is None or type(fontsets) in (list,tuple)
         
         self.srs = safe_str(srs)
         self.layers = layers or []
+        self.fontsets = fontsets or []
         self.background = background
 
     def __repr__(self):
@@ -33,7 +35,10 @@ class Map:
                 mmap.background = mapnik.Color(str(self.background))
             
             ids = (i for i in xrange(1, 999999))
-            
+
+            for fontset in self.fontsets:
+                mmap.append_fontset(fontset.name, fontset.to_mapnik())
+
             for layer in self.layers:
                 for style in layer.styles:
     
@@ -119,6 +124,16 @@ class Layer:
 
     def __repr__(self):
         return 'Layer(%s: %s)' % (self.name, repr(self.styles))
+
+class Fontset:
+    def __init__(self, name, face_names):
+        self.name = safe_str(name)
+        self.face_names = face_names or []
+    def to_mapnik(self):
+        fs = mapnik.Fontset(self.name)
+        for face_name in self.face_names:
+            fs.add_face_name(face_name)
+        return fs
 
 class Datasource:
     def __init__(self, **parameters):
@@ -354,9 +369,7 @@ class TextSymbolizer:
               mapnik.justify_alignment.MIDDLE)
 
         if self.fontset:
-        #    sym.fontset = str(self.fontset)
-             # not viable via python
-            sys.stderr.write('\nCascadenik debug: Warning, FontSets will be ignored as they are not yet supported in Mapnik via Python...\n')
+            sym.fontset = mapnik.Fontset(str(self.fontset))
         
         if MAPNIK_VERSION >= 20000:
             sym.displacement = (self.dx or 0.0, self.dy or 0.0)

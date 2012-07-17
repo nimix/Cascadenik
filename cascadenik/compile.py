@@ -1504,6 +1504,12 @@ def compile(src, dirs, verbose=False, srs=None, datasources_cfg=None, scale=1):
         if base_el.tag != 'Datasource':
             continue
         datasource_templates[base_el.get('name')] = dict(((p.get('name'),p.text) for p in base_el.findall('Parameter')))
+
+    fontsets = []
+    for fontset_el in map_el.findall('FontSet'):
+        name = fontset_el.get('name', 'noName')
+        face_names = [f.get('face_name') for f in fontset_el.findall('Font')]
+        fontsets.append(output.Fontset(name,face_names))
     
     for layer_el in map_el.findall('Layer'):
     
@@ -1601,4 +1607,4 @@ def compile(src, dirs, verbose=False, srs=None, datasources_cfg=None, scale=1):
     if srs is not None:
         map_el.set('srs', srs)
     
-    return output.Map(map_el.attrib.get('srs', None), layers, **map_attrs)
+    return output.Map(map_el.attrib.get('srs', None), layers, fontsets, **map_attrs)
