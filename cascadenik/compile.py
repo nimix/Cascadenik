@@ -598,7 +598,7 @@ def is_merc_projection(srs):
     # expected
     # note, common optional modifiers like +no_defs, +over, and +wkt
     # are not pairs and should not prevent matching
-    gym = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null'
+    gym = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m'
     gym = dict([p.split('=') for p in gym.split() if '=' in p])
         
     for p in gym:
