@@ -72,6 +72,16 @@ if not Image:
     warn = 'Warning: PIL (Python Imaging Library) is required for proper handling of image symbolizers when using JPEG format images or not running Mapnik >=0.7.0\n'
     sys.stderr.write(warn)
 
+try:
+    import rsvg
+except ImportError:
+    rsvg = False
+
+if not rsvg:
+    warn = 'Warning: rsvg python binding is required for proper handling of svg image symbolizers\n'
+    sys.stderr.write(warn)
+
+
 DEFAULT_ENCODING = 'utf-8'
 
 try:
@@ -1125,11 +1135,8 @@ def post_process_symbolizer_image_file(file_href, dirs):
     if not mapnik_auto_image_support and not Image:
         raise SystemExit('PIL (Python Imaging Library) is required for handling image data unless you are using PNG inputs and running Mapnik >=0.7.0')
 
-    img = Image.open(un_posix(path))
-    
     if mapnik_requires_absolute_paths:
         path = posixpath.realpath(path)
-    
     else:
         path = dirs.output_path(path)
 
@@ -1137,7 +1144,14 @@ def post_process_symbolizer_image_file(file_href, dirs):
 
     image_name, ext = posixpath.splitext(path)
     
-    if ext in ('.png', '.tif', '.tiff'):
+    if ext == '.svg':
+        img = rsvg.Handle(file=un_posix(path))
+        size = (img.get_dimension_data()[0], img.get_dimension_data()[1])
+    else:
+        img = Image.open(un_posix(path))
+        size = img.size
+
+    if ext in ('.png', '.tif', '.tiff', '.svg'):
         output_ext = ext
     else:
         output_ext = '.png'
@@ -1150,7 +1164,7 @@ def post_process_symbolizer_image_file(file_href, dirs):
 
     msg('Destination file: %s' % dest_file)
 
-    return dest_file, output_ext[1:], img.size[0], img.size[1]
+    return dest_file, output_ext[1:], size[0], size[1]
 
 def get_shield_rule_groups(declarations, dirs):
     """ Given a list of declarations, return a list of output.Rule objects.
