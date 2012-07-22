@@ -128,11 +128,45 @@ class legend_renderer:
             styles = [s for s in styles if s.rules]
         
             if styles:
+                minzoom = layer_el.get('min_zoom', None) and int(layer_el.get('min_zoom'))
+                maxzoom = layer_el.get('max_zoom', None) and int(layer_el.get('max_zoom'))
+
+                zooms = {
+                     0: (500000000, 1000000000),
+                     1: (200000000, 500000000),
+                     2: (100000000, 200000000),
+                     3: (50000000, 100000000),
+                     4: (25000000, 50000000),
+                     5: (12500000, 25000000),
+                     6: (6500000, 12500000),
+                     7: (3000000, 6500000),
+                     8: (1500000, 3000000),
+                     9: (750000, 1500000),
+                    10: (400000, 750000),
+                    11: (200000, 400000),
+                    12: (100000, 200000),
+                    13: (50000, 100000),
+                    14: (25000, 50000),
+                    15: (12500, 25000),
+                    16: (5000, 12500),
+                    17: (2500, 5000),
+                    18: (1000, 2500),
+                    19: (500, 1000),
+                    20: (250, 500),
+                    21: (100, 250),
+                    22: (50, 100),
+                   }
+
+                if minzoom is not None and maxzoom is not None and minzoom < 23 and maxzoom < 23:
+                    tminzoom = min(zooms[maxzoom])
+                    maxzoom = max(zooms[minzoom])
+                    minzoom = tminzoom
+
                 layer = output.Layer('layer %d' % ids.next(),
                                      None, styles,
                                      layer_el.get('srs', None),
-                                     layer_el.get('min_zoom', None) and int(layer_el.get('min_zoom')) or None,
-                                     layer_el.get('max_zoom', None) and int(layer_el.get('max_zoom')) or None)
+                                     minzoom,
+                                     maxzoom)
 
                 layer.classes = set(layer_el.get('class', '').split())
     
@@ -299,7 +333,7 @@ def main(src_file, legend_file, dest_dir, **kwargs):
     
     return 0
 
-parser = optparse.OptionParser(usage="""%prog [options] <mml> <xml>""", version='%prog ' + cascadenik.VERSION)
+parser = optparse.OptionParser(usage="""%prog [options] <mml> <xml>""", version='%prog ' + cascadenik.__version__)
 
 parser.set_defaults(cache_dir=None, pretty=True, verbose=False, datasources_cfg=None)
 
